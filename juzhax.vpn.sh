@@ -43,9 +43,6 @@ iptables -A INPUT -i eth0 -p gre -j ACCEPT
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 iptables -A FORWARD -i ppp+ -o eth0 -j ACCEPT
 iptables -A FORWARD -i eth0 -o ppp+ -j ACCEPT
-
-/sbin/service iptables save
-
 service iptables save
 service iptables restart
 chkconfig pptpd on
@@ -60,35 +57,3 @@ echo -e '\E[37;44m'"\033[1m Username: $VPN_USER\033[0m"
 echo -e '\E[37;44m'"\033[1m Password: $VPN_PASS\033[0m"
 
 ) 2>&1 | tee /var/log/vpn-installer.log
-
-
-
-
-
-
-
-echo "localip $VPN_LOCAL" >> /etc/pptpd.conf # Local IP address of your VPN server
-echo "remoteip $VPN_REMOTE" >> /etc/pptpd.conf # Scope for your home network
-
-echo "ms-dns 8.8.8.8" >> /etc/ppp/options.pptpd # Google DNS Primary
-echo "ms-dns 209.244.0.3" >> /etc/ppp/options.pptpd # Level3 Primary
-echo "ms-dns 208.67.222.222" >> /etc/ppp/options.pptpd # OpenDNS Primary
-
-echo "$VPN_USER pptpd $VPN_PASS *" >> /etc/ppp/chap-secrets
-
-service iptables start
-echo "iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE" >> /etc/rc.local
-iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-service iptables save
-service iptables restart
-
-service pptpd restart
-chkconfig pptpd on
-
-echo -e '\E[37;44m'"\033[1m Installation Log: /var/log/juzhax-vpn.log \033[0m"
-echo -e '\E[37;44m'"\033[1m You can now connect to your VPN via your external IP ($VPN_IP)\033[0m"
-
-echo -e '\E[37;44m'"\033[1m Username: $VPN_USER\033[0m"
-echo -e '\E[37;44m'"\033[1m Password: $VPN_PASS\033[0m"
-
-) 2>&1 | tee /var/log/juzhax-vpn.log
